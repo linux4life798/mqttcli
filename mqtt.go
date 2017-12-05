@@ -103,27 +103,27 @@ func getRandomClientId() string {
 func NewOption(c *cli.Context) (*MQTT.ClientOptions, error) {
 	opts := MQTT.NewClientOptions()
 
-	host := c.String("host")
-	port := c.Int("p")
+	host := c.GlobalString("host")
+	port := c.GlobalInt("p")
 
 	if host == "" {
-		err := getSettingsFromFile(c.String("conf"), opts)
+		err := getSettingsFromFile(c.GlobalString("conf"), opts)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	clientId := c.String("i")
+	clientId := c.GlobalString("i")
 	if clientId == "" {
 		clientId = getRandomClientId()
 	}
 	opts.SetClientID(clientId)
 
 	scheme := "tcp"
-	cafile := c.String("cafile")
-	key := c.String("key")
-	cert := c.String("cert")
-	insecure := c.Bool("insecure")
+	cafile := c.GlobalString("cafile")
+	key := c.GlobalString("key")
+	cert := c.GlobalString("cert")
+	insecure := c.GlobalBool("insecure")
 	tlsConfig, ok, err := makeTlsConfig(cafile, cert, key, insecure)
 	if err != nil {
 		return nil, err
@@ -133,11 +133,11 @@ func NewOption(c *cli.Context) (*MQTT.ClientOptions, error) {
 		scheme = "ssl"
 	}
 
-	user := c.String("u")
+	user := c.GlobalString("u")
 	if user != "" {
 		opts.SetUsername(user)
 	}
-	password := c.String("P")
+	password := c.GlobalString("P")
 	if password != "" {
 		opts.SetPassword(password)
 	}

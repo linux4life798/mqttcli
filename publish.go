@@ -22,15 +22,15 @@ func publish(c *cli.Context) error {
 		os.Exit(1)
 	}
 
-	qos := c.Int("q")
-	topic := c.String("t")
+	qos := c.GlobalInt("q")
+	topic := c.GlobalString("t")
 	if topic == "" {
 		log.Errorf("Please specify topic")
 		os.Exit(1)
 	}
 	log.Infof("Topic: %s", topic)
 
-	retain := c.Bool("r")
+	retain := c.GlobalBool("r")
 
 	if c.Bool("s") {
 		// Read from Stdin
@@ -43,7 +43,7 @@ func publish(c *cli.Context) error {
 
 		}
 	} else {
-		payload := c.String("m")
+		payload := c.GlobalString("m")
 		err = client.Publish(topic, []byte(payload), qos, retain, true)
 		if err != nil {
 			log.Error(err)

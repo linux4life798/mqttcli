@@ -18,7 +18,7 @@ func subscribe(c *cli.Context) error {
 	opts.SetKeepAlive(time.Second * 60)
 
 	if c.Bool("c") {
-		clientId := c.String("i")
+		clientId := c.GlobalString("i")
 		if clientId == "" {
 			log.Warn("clean Flag does not work without client id")
 		}
@@ -26,8 +26,8 @@ func subscribe(c *cli.Context) error {
 		opts.SetCleanSession(false)
 	}
 
-	qos := c.Int("q")
-	topic := c.String("t")
+	qos := c.GlobalInt("q")
+	topic := c.GlobalString("t")
 	if topic == "" {
 		log.Errorf("Please specify topic")
 		os.Exit(1)

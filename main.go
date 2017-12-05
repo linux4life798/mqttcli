@@ -26,10 +26,10 @@ func init() {
 
 // connects MQTT broker
 func connect(c *cli.Context, opts *MQTT.ClientOptions, subscribed map[string]byte) (*MQTTClient, error) {
-	willPayload := c.String("will-payload")
-	willQoS := c.Int("will-qos")
-	willRetain := c.Bool("will-retain")
-	willTopic := c.String("will-topic")
+	willPayload := c.GlobalString("will-payload")
+	willQoS := c.GlobalInt("will-qos")
+	willRetain := c.GlobalBool("will-retain")
+	willTopic := c.GlobalString("will-topic")
 	if willPayload != "" && willTopic != "" {
 		opts.SetWill(willTopic, willPayload, byte(willQoS), willRetain)
 	}
@@ -57,7 +57,7 @@ func pubsub(c *cli.Context) error {
 		os.Exit(1)
 	}
 
-	qos := c.Int("q")
+	qos := c.GlobalInt("q")
 	subtopic := c.String("sub")
 	if subtopic == "" {
 		log.Errorf("Please specify sub topic")
@@ -70,7 +70,7 @@ func pubsub(c *cli.Context) error {
 		os.Exit(1)
 	}
 	log.Infof("Pub Topic: %s", pubtopic)
-	retain := c.Bool("r")
+	retain := c.GlobalBool("r")
 
 	subscribed := map[string]byte{
 		subtopic: byte(0),
@@ -106,7 +106,7 @@ func main() {
 	app.Usage = usage
 	app.Version = version
 
-	commonFlags := []cli.Flag{
+	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "host",
 			Value:  "",
@@ -215,19 +215,19 @@ func main() {
 			Usage: "the topic on which to publish the client Will",
 		},
 	}
-	pubFlags := append(commonFlags,
+	pubFlags := []cli.Flag{
 		cli.BoolFlag{
 			Name:  "s",
 			Usage: "read message from stdin, sending line by line as a message",
 		},
-	)
-	subFlags := append(commonFlags,
+	}
+	subFlags := []cli.Flag{
 		cli.BoolFlag{
 			Name:  "c",
 			Usage: "disable 'clean session'",
 		},
-	)
-	pubsubFlags := append(commonFlags,
+	}
+	pubsubFlags := []cli.Flag{
 		cli.StringFlag{
 			Name:  "pub",
 			Usage: "publish topic",
@@ -236,7 +236,7 @@ func main() {
 			Name:  "sub",
 			Usage: "subscribe topic",
 		},
-	)
+	}
 
 	app.Commands = []cli.Command{
 		{
@@ -265,12 +265,12 @@ func main() {
 }
 
 func setDebugLevel(c *cli.Context) {
-	if c.Bool("d") {
+	if c.GlobalBool("d") {
 		log.SetLevel(log.DebugLevel)
-	} else if c.Bool("dd") {
+	} else if c.GlobalBool("dd") {
 		log.SetLevel(log.DebugLevel)
 		MQTT.WARN = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
-	} else if c.Bool("ddd") {
+	} else if c.GlobalBool("ddd") {
 		log.SetLevel(log.DebugLevel)
 		MQTT.DEBUG = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
 	}
